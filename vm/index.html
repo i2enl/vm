@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>VM - Organizador de espetáculos</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ae1329">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VM">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root{
+        --ink:#191310;
+        --panel:#241b16;
+        --panel-2:#2c2018;
+        --paper:#f6efe0;
+        --paper-2:#ece2c9;
+        --red:#ae1329;
+        --red-2:#7a0d1d;
+        --red-bright:#d4183a;
+        --cross:#fbf6ea;
+        --brass:#c19a55;
+        --brass-soft:rgba(193,154,85,0.35);
+        --ink-text:#f5efe2;
+        --muted:#a89a89;
+        --line:rgba(247,241,228,0.14);
+        --success:#5aab77;
+        --success-bg:rgba(90,171,119,0.14);
+        --danger:#e2645a;
+        --danger-bg:rgba(226,100,90,0.14);
+        --radius-lg:26px;
+        --radius-md:16px;
+        --radius-sm:10px;
+    }
+
+    *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+    body{
+        font-family:'Inter', sans-serif;
+        background-color:var(--ink);
+        background-image:
+            radial-gradient(circle at 12% -8%, rgba(174,19,41,0.38) 0%, transparent 45%),
+            radial-gradient(circle at 105% 25%, rgba(193,154,85,0.14) 0%, transparent 55%),
+            radial-gradient(circle at 20% 95%, rgba(174,19,41,0.16) 0%, transparent 40%);
+        background-attachment:fixed;
+        color:var(--ink-text);
+        padding-bottom:110px;
+        min-height:100vh;
+    }
+
+    .eyebrow{
+        font-family:'IBM Plex Mono', monospace;
+        font-size:0.66rem;
+        letter-spacing:0.14em;
+        text-transform:uppercase;
+        color:var(--brass);
+        font-weight:600;
+    }
+
+    h1,h2,h3,.display{ font-family:'Fraunces', serif; }
+
+    /* ---------- TOPBAR ---------- */
+    header.topbar{
+        background:rgba(25,19,16,0.86);
+        backdrop-filter:blur(14px);
+        border-bottom:1px solid var(--line);
+        padding:12px 18px;
+        position:sticky;
+        top:0;
+        z-index:1000;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+    }
+
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .brand-mark{ width:34px; height:34px; flex-shrink:0; filter:drop-shadow(0 3px 6px rgba(174,19,41,0.5)); }
+    .brand-text h1{ font-size:1.02rem; font-weight:700; letter-spacing:0.01em; color:var(--ink-text); line-height:1.1; }
+    .brand-text .eyebrow{ margin-top:1px; }
+
+    .header-links{ display:flex; gap:6px; }
+    .btn-header{
+        background:rgba(193,154,85,0.1);
+        color:var(--brass);
+        border:1px solid var(--brass-soft);
+        padding:6px 10px;
+        border-radius:20px;
+        font-size:0.7rem;
+        font-weight:600;
+        text-decoration:none;
+        display:flex;
+        align-items:center;
+        gap:5px;
+        white-space:nowrap;
+    }
+    .btn-header.alt{ border-color:rgba(212,24,58,0.45); color:#ff8a92; }
+
+    .container{ max-width:560px; margin:0 auto; padding:16px; }
+
+    /* ---------- HERO / PASSAPORTE DO DIA ---------- */
+    .hero{
+        position:relative;
+        background:linear-gradient(155deg, var(--panel-2) 0%, var(--panel) 65%);
+        border:1px solid var(--line);
+        border-radius:var(--radius-lg);
+        padding:20px 22px 26px;
+        margin-bottom:14px;
+        overflow:hidden;
+        clip-path:polygon(0 0,100% 0,100% calc(100% - 34px),calc(100% - 34px) 100%,0 100%);
+        box-shadow:0 24px 50px -20px rgba(0,0,0,0.6);
+    }
+    .hero::before{
+        content:'';
+        position:absolute;
+        inset:0;
+        background:radial-gradient(circle at 100% 0%, rgba(174,19,41,0.45), transparent 55%);
+        pointer-events:none;
+    }
+    .hero-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; position:relative; }
+    .hero-dates{ font-size:0.66rem; }
+    .hero h2{ font-size:1.32rem; font-weight:600; color:var(--ink-text); margin-bottom:2px; }
+    .hero-sub{ font-size:0.8rem; color:var(--muted); margin-bottom:16px; }
+
+    .date-row{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        background:rgba(0,0,0,0.22);
+        border:1px solid var(--line);
+        border-radius:var(--radius-md);
+        padding:12px 14px;
+        position:relative;
+    }
+    .date-row i{ color:var(--brass); font-size:1rem; }
+    .date-legivel{ font-family:'Fraunces', serif; font-weight:600; font-size:0.98rem; color:var(--ink-text); text-transform:capitalize; }
+    .date-legivel small{ display:block; font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:0.66rem; color:var(--muted); letter-spacing:0.05em; margin-top:1px; }
+    .date-input{
+        position:absolute; inset:0; width:100%; height:100%;
+        opacity:0; cursor:pointer; border:none;
+    }
+
+    /* ---------- SEGMENTED TABS ---------- */
+    .tab-switcher{
+        background:rgba(255,255,255,0.04);
+        border:1px solid var(--line);
+        padding:4px;
+        border-radius:var(--radius-md);
+        display:flex;
+        margin-bottom:16px;
+        gap:4px;
+    }
+    .tab-btn{
+        flex:1; padding:11px 8px; border:none; background:transparent;
+        color:var(--muted); font-weight:600; font-size:0.78rem;
+        font-family:'Inter',sans-serif;
+        border-radius:11px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:6px;
+        transition:all .18s ease;
+    }
+    .tab-btn.active{
+        background:linear-gradient(135deg, var(--red-bright) 0%, var(--red-2) 100%);
+        color:#fff;
+        box-shadow:0 6px 16px -4px rgba(174,19,41,0.7);
+    }
+
+    /* ---------- CARDS ---------- */
+    .card{
+        background:rgba(36,27,22,0.82);
+        backdrop-filter:blur(10px);
+        border:1px solid var(--line);
+        border-radius:var(--radius-lg);
+        padding:18px;
+        margin-bottom:14px;
+    }
+
+    .ribbon-tag{
+        display:inline-flex; align-items:center; gap:7px;
+        background:linear-gradient(135deg, var(--red-bright), var(--red-2));
+        color:#fff;
+        font-family:'IBM Plex Mono', monospace;
+        font-size:0.68rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase;
+        padding:7px 30px 7px 12px;
+        clip-path:polygon(0 0, 100% 0, 90% 50%, 100% 100%, 0 100%);
+        margin-bottom:14px;
+    }
+    .ribbon-tag i{ font-size:0.75rem; }
+
+    /* ---------- EVENT / TICKET CARD ---------- */
+    .evento-card{
+        display:flex;
+        background:var(--paper);
+        border-radius:14px;
+        margin-bottom:12px;
+        overflow:hidden;
+        border:1px solid rgba(0,0,0,0.08);
+        transition:box-shadow .18s ease, transform .18s ease;
+    }
+    .evento-card.selected{ box-shadow:0 0 0 2px var(--red-bright); transform:translateY(-1px); }
+
+    .evento-info{
+        flex:1; padding:13px 12px; cursor:pointer; min-width:0;
+    }
+    .evento-info h4{ font-family:'Fraunces', serif; font-size:0.98rem; font-weight:600; color:#241a14; margin-bottom:6px; line-height:1.25; }
+    .evento-tags{ display:flex; flex-wrap:wrap; gap:6px; }
+    .tag{
+        font-family:'IBM Plex Mono', monospace;
+        font-size:0.66rem; font-weight:500;
+        padding:3px 8px;
+        border-radius:20px;
+        background:rgba(36,27,22,0.08);
+        color:#5c4f43;
+        display:inline-flex; align-items:center; gap:4px;
+    }
+    .tag-preco{ background:rgba(90,171,119,0.16); color:#2f7a4d; font-weight:600; }
+    .tag-preco.pago{ background:rgba(174,19,41,0.12); color:var(--red-2); }
+
+    .btn-info{ background:transparent; border:none; color:var(--red); font-size:0.85rem; padding:0 4px; cursor:pointer; }
+
+    .evento-descricao{
+        display:none; margin-top:9px; padding-top:9px;
+        border-top:1px dashed rgba(36,27,22,0.18);
+        font-size:0.78rem; color:#584c40; line-height:1.45;
+    }
+
+    .stub{
+        width:64px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        background:var(--paper-2);
+        border-left:2px dashed rgba(36,27,22,0.22);
+        cursor:pointer;
+        position:relative;
+    }
+    .stub::before, .stub::after{
+        content:''; position:absolute; left:-7px; width:14px; height:14px;
+        border-radius:50%; background:var(--ink);
+    }
+    .stub::before{ top:-7px; }
+    .stub::after{ bottom:-7px; }
+
+    .custom-chk{
+        width:26px; height:26px; border-radius:8px;
+        border:2px solid rgba(36,27,22,0.25);
+        display:flex; align-items:center; justify-content:center;
+        color:transparent; background:rgba(255,255,255,0.4);
+    }
+    .custom-chk i{ font-size:0.72rem; transform:scale(0); transition:transform .15s ease; }
+    .evento-card.selected .custom-chk{
+        background:linear-gradient(135deg, var(--red-bright), var(--red-2));
+        border-color:var(--red-2); color:#fff;
+    }
+    .evento-card.selected .custom-chk i{ transform:scale(1); }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-action{
+        width:100%; padding:15px; border:none;
+        border-radius:var(--radius-md);
+        background:linear-gradient(135deg, var(--red-bright) 0%, var(--red-2) 100%);
+        color:#fff; font-weight:700; font-size:0.88rem;
+        font-family:'Inter',sans-serif;
+        cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:9px;
+        box-shadow:0 10px 24px -8px rgba(174,19,41,0.8);
+        margin-bottom:12px;
+        letter-spacing:0.01em;
+    }
+    .btn-action:active{ transform:translateY(1px); }
+
+    /* ---------- ALERTS ---------- */
+    .alert-box{ padding:13px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:0.82rem; line-height:1.45; }
+    .alert-box.danger{ background:var(--danger-bg); border:1px solid rgba(226,100,90,0.35); color:#ffb3ac; }
+    .alert-box.success{ background:var(--success-bg); border:1px solid rgba(90,171,119,0.35); color:#a6e0ba; }
+    .alert-box strong{ display:flex; align-items:center; gap:7px; margin-bottom:3px; font-family:'Fraunces',serif; font-size:0.92rem; }
+
+    /* ---------- ROTA / PENNANT TRAIL ---------- */
+    .rota{ position:relative; padding-left:22px; }
+    .rota::before{
+        content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1px;
+        background:repeating-linear-gradient(to bottom, var(--brass-soft) 0 6px, transparent 6px 12px);
+    }
+    .rota-passo{ position:relative; padding-bottom:16px; }
+    .rota-passo:last-child{ padding-bottom:0; }
+    .rota-pin{
+        position:absolute; left:-22px; top:2px;
+        width:13px; height:13px; background:var(--red-bright);
+        clip-path:polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);
+        box-shadow:0 0 0 3px var(--ink), 0 0 0 4px var(--brass-soft);
+    }
+    .rota-passo strong{ font-family:'Fraunces', serif; font-size:0.95rem; color:#fff; display:block; margin-bottom:2px; }
+    .rota-meta{ font-size:0.76rem; color:var(--muted); display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .rota-preco{ font-family:'IBM Plex Mono', monospace; font-size:0.7rem; font-weight:600; color:var(--success); }
+
+    .deslocamento{
+        display:inline-flex; align-items:center; gap:6px;
+        margin:2px 0 12px -22px;
+        padding:5px 10px 5px 8px;
+        background:rgba(193,154,85,0.1);
+        border:1px dashed var(--brass-soft);
+        border-radius:20px;
+        font-family:'IBM Plex Mono', monospace;
+        font-size:0.68rem; color:var(--brass);
+        transform:rotate(-1deg);
+    }
+
+    /* ---------- INPUTS ---------- */
+    .input-group{ margin-bottom:14px; }
+    .input-group label{ display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--muted); margin-bottom:6px; font-weight:600; }
+    .modern-input{
+        width:100%; padding:12px 14px;
+        background:rgba(0,0,0,0.25);
+        border:1px solid var(--line);
+        border-radius:var(--radius-sm);
+        color:#fff; font-size:0.95rem;
+        font-family:'IBM Plex Mono', monospace;
+        outline:none;
+    }
+    .modern-input:focus{ border-color:var(--brass); }
+
+    .tab-content{ display:none; }
+    .tab-content.active{ display:block; }
+
+    /* ---------- INSTALL ---------- */
+    .install-fab{
+        position:fixed; left:16px; right:16px; bottom:16px;
+        max-width:528px; margin:0 auto;
+        background:linear-gradient(135deg, var(--panel-2), var(--panel));
+        border:1px solid var(--brass-soft);
+        border-radius:18px;
+        padding:12px 12px 12px 14px;
+        display:flex; align-items:center; gap:12px;
+        box-shadow:0 18px 40px -12px rgba(0,0,0,0.65);
+        z-index:1200;
+        transform:translateY(140%);
+        transition:transform .35s cubic-bezier(.2,.9,.3,1.2);
+    }
+    .install-fab.show{ transform:translateY(0); }
+    .install-fab img{ width:38px; height:38px; flex-shrink:0; }
+    .install-fab-text{ flex:1; min-width:0; }
+    .install-fab-text strong{ display:block; font-family:'Fraunces',serif; font-size:0.88rem; color:#fff; }
+    .install-fab-text span{ font-size:0.72rem; color:var(--muted); }
+    .install-fab-btn{
+        background:linear-gradient(135deg, var(--red-bright), var(--red-2));
+        color:#fff; border:none; padding:9px 14px; border-radius:12px;
+        font-weight:700; font-size:0.76rem; cursor:pointer; white-space:nowrap;
+    }
+    .install-fab-close{ background:transparent; border:none; color:var(--muted); font-size:0.9rem; padding:4px; cursor:pointer; }
+
+    .install-modal-backdrop{
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+        z-index:1300; align-items:flex-end; justify-content:center;
+        backdrop-filter:blur(3px);
+    }
+    .install-modal-backdrop.show{ display:flex; }
+    .install-modal{
+        width:100%; max-width:520px;
+        background:var(--panel-2);
+        border:1px solid var(--line);
+        border-radius:24px 24px 0 0;
+        padding:22px 22px 28px;
+    }
+    .install-modal h3{ font-size:1.1rem; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+    .install-modal p{ font-size:0.82rem; color:var(--muted); line-height:1.5; margin-bottom:14px; }
+    .install-steps{ list-style:none; }
+    .install-steps li{
+        display:flex; align-items:center; gap:10px;
+        font-size:0.84rem; color:var(--ink-text);
+        padding:9px 0; border-top:1px solid var(--line);
+    }
+    .install-steps li:first-child{ border-top:none; }
+    .install-steps .num{
+        width:22px; height:22px; border-radius:6px; flex-shrink:0;
+        background:rgba(193,154,85,0.16); color:var(--brass);
+        display:flex; align-items:center; justify-content:center;
+        font-family:'IBM Plex Mono', monospace; font-size:0.72rem; font-weight:600;
+    }
+    .install-modal-close{
+        width:100%; margin-top:16px; padding:12px; border-radius:12px;
+        background:rgba(255,255,255,0.06); border:1px solid var(--line);
+        color:var(--ink-text); font-weight:600; font-size:0.85rem; cursor:pointer;
+    }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <img src="icon-512.png" alt="Brand Mark" class="brand-mark" width="100" height="100" />
+        <div class="brand-text">
+            <h1>VIAGEM MEDIEVAL</h1>
+            <p class="eyebrow">Organizador de espetáculos</p>
+        </div>
+    </div>
+    <div class="header-links">
+        <a href="../vm/games" target="_blank" class="btn-header alt">
+            <i class="fa-solid fa-gamepad"></i> Jogo
+        </a>
+        <a href="https://www.viagemmedieval.com/" target="_blank" class="btn-header">
+            <i class="fa-solid fa-globe"></i> Oficial
+        </a>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- HERO / PASSAPORTE DO DIA -->
+    <div class="hero">
+        <div class="hero-top">
+            <span class="eyebrow hero-dates"><i class="fa-solid fa-scroll"></i> 28 JUL — 09 AGO 2026</span>
+        </div>
+        <h2>O seu dia na Viagem</h2>
+        <p class="hero-sub">Escolha a data, monte o roteiro e não perca um cortejo.</p>
+
+        <div class="date-row">
+            <i class="fa-solid fa-calendar-day"></i>
+            <div class="date-legivel" id="data-legivel">A carregar…</div>
+            <input type="date" id="data-visita" class="date-input" min="2026-07-28" max="2026-08-09" onchange="mudarData()">
+        </div>
+    </div>
+
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="mudarAba('manual')">
+            <i class="fa-solid fa-list-check"></i> Meu Roteiro
+        </button>
+        <button class="tab-btn" onclick="mudarAba('auto')">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Otimizador
+        </button>
+    </div>
+
+    <!-- ABA 1: MANUAL -->
+    <div id="tab-manual" class="tab-content active">
+
+        <button class="btn-action" onclick="validarEsquema()">
+            <i class="fa-solid fa-compass"></i> Validar Roteiro Selecionado
+        </button>
+
+        <div id="resultado-validacao" class="card" style="display:none;"></div>
+
+        <div class="card">
+            <div class="ribbon-tag"><i class="fa-solid fa-clock"></i> Espetáculos do Dia</div>
+            <div id="lista-eventos">A carregar programa…</div>
+        </div>
+
+    </div>
+
+    <!-- ABA 2: OTIMIZADOR AUTOMÁTICO -->
+    <div id="tab-auto" class="tab-content">
+        <div class="card">
+            <div class="ribbon-tag"><i class="fa-solid fa-bolt"></i> Sugestão Automática</div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-coins"></i> Orçamento Máximo (€)</label>
+                <input type="number" id="orcamento-input" value="20" class="modern-input">
+            </div>
+
+            <button class="btn-action" onclick="gerarRoteiroOtimizado()">
+                <i class="fa-solid fa-route"></i> Gerar Melhor Programa
+            </button>
+        </div>
+
+        <div id="resultado-otimizacao" class="card" style="display:none;"></div>
+    </div>
+
+</div>
+
+<!-- INSTALL FAB -->
+<div class="install-fab" id="install-fab">
+    <img src="icon-192.png" alt="Ícone Viagem Medieval">
+    <div class="install-fab-text">
+        <strong>Leve a Viagem consigo</strong>
+        <span>Instale no ecrã principal e use como uma app</span>
+    </div>
+    <button class="install-fab-btn" onclick="instalarApp()">Instalar</button>
+    <button class="install-fab-close" onclick="fecharInstallFab()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+<!-- INSTALL MODAL (instruções manuais, ex.: iOS) -->
+<div class="install-modal-backdrop" id="install-modal">
+    <div class="install-modal">
+        <h3><i class="fa-solid fa-shield-halved" style="color:var(--red-bright)"></i> Instalar a app</h3>
+        <p id="install-modal-desc">Adicione ao ecrã principal para abrir como uma app, sem barra do navegador.</p>
+        <ul class="install-steps" id="install-steps"></ul>
+        <button class="install-modal-close" onclick="fecharInstallModal()">Entendido</button>
+    </div>
+</div>
+
+<script>
+    let deferredPrompt = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const hoje = new Date().toISOString().split('T')[0];
+        const dataInput = document.getElementById('data-visita');
+        dataInput.value = (hoje >= '2026-07-28' && hoje <= '2026-08-09') ? hoje : '2026-07-28';
+        atualizarDataLegivel();
+        carregarEventos();
+        prepararInstalacao();
+    });
+
+    function mudarData() {
+        atualizarDataLegivel();
+        carregarEventos();
+    }
+
+    function atualizarDataLegivel() {
+        const val = document.getElementById('data-visita').value;
+        const el = document.getElementById('data-legivel');
+        if (!val) { el.innerHTML = 'Escolher data'; return; }
+        const [y, m, d] = val.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        const diaSemana = dt.toLocaleDateString('pt-PT', { weekday: 'long' });
+        const dataFormatada = dt.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long' });
+        el.innerHTML = `${diaSemana}<small>${dataFormatada.toUpperCase()} · 2026</small>`;
+    }
+
+    function mudarAba(aba) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        if (aba === 'manual') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-manual').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-auto').classList.add('active');
+        }
+    }
+
+    async function carregarEventos() {
+        const dataSel = document.getElementById('data-visita').value;
+        const container = document.getElementById('lista-eventos');
+        container.innerHTML = '<p style="color:var(--muted);">A carregar programa...</p>';
+
+        document.getElementById('resultado-validacao').style.display = 'none';
+        document.getElementById('resultado-otimizacao').style.display = 'none';
+
+        try {
+            const res = await fetch(`api.php?acao=eventos&data=${dataSel}`);
+            const resposta = await res.json();
+
+            if (resposta.status === 'sucesso') {
+                if (resposta.dados.length === 0) {
+                    container.innerHTML = '<p style="color:var(--muted); padding:10px 0;">Sem eventos agendados ou todos os eventos de hoje já terminaram.</p>';
+                    return;
+                }
+
+                let html = '';
+                resposta.dados.forEach(ev => {
+                    const precoLabel = ev.preco > 0 ? ev.preco.toFixed(2) + '€' : 'Grátis';
+                    const precoClass = ev.preco > 0 ? 'tag-preco pago' : 'tag-preco';
+                    html += `
+                        <div class="evento-card" id="card-${ev.id}">
+                            <div class="evento-info" onclick="toggleEvento(${ev.id})">
+                                <h4>
+                                    ${ev.nome}
+                                    <button type="button" class="btn-info" onclick="toggleDescricao(event, ${ev.id})" title="Ver descrição">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </h4>
+                                <div class="evento-tags">
+                                    <span class="tag"><i class="fa-regular fa-clock"></i> ${ev.inicio} - ${ev.fim}</span><br>
+                                    <span class="tag"><i class="fa-solid fa-location-dot"></i> ${ev.local}</span>
+                                    <span class="tag ${precoClass}">${precoLabel}</span>
+                                </div>
+                                <div class="evento-descricao" id="desc-${ev.id}">${ev.descricao}</div>
+                            </div>
+                            <div class="stub" onclick="toggleEvento(${ev.id})">
+                                <div class="custom-chk"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                            <input type="checkbox" value="${ev.id}" id="chk-${ev.id}" class="chk-evento" style="display:none;">
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        } catch (e) {
+            container.innerHTML = '<p style="color:var(--danger);">Erro ao carregar o programa.</p>';
+        }
+    }
+
+    function toggleEvento(id) {
+        const card = document.getElementById(`card-${id}`);
+        const chk = document.getElementById(`chk-${id}`);
+        chk.checked = !chk.checked;
+
+        if (chk.checked) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    }
+
+    function toggleDescricao(e, id) {
+        e.stopPropagation();
+        const desc = document.getElementById(`desc-${id}`);
+        desc.style.display = (desc.style.display === 'block') ? 'none' : 'block';
+    }
+
+    async function validarEsquema() {
+        const dataSel = document.getElementById('data-visita').value;
+        const checkboxes = document.querySelectorAll('.chk-evento:checked');
+        const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (ids.length === 0) {
+            alert('Por favor selecione pelo menos 1 espectáculo.');
+            return;
+        }
+
+        const res = await fetch(`api.php?acao=validar&data=${dataSel}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ eventos_ids: ids })
+        });
+
+        const data = await res.json();
+        const divRes = document.getElementById('resultado-validacao');
+        divRes.style.display = 'block';
+
+        let html = '';
+        if (!data.viavel) {
+            html += `
+                <div class="alert-box danger">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> Conflito Detectado</strong>
+                    ${data.alertas.join('<br>')}
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="alert-box success">
+                    <strong><i class="fa-solid fa-circle-check"></i> Roteiro Válido!</strong>
+                    Os horários selecionados não se sobrepõem.
+                </div>
+            `;
+        }
+
+        html += `<div class="ribbon-tag"><i class="fa-solid fa-timeline"></i> Sequência (${data.preco_total})</div>`;
+        html += `<div class="rota">`;
+
+        data.roteiro.forEach((item, index) => {
+            const ev = item.evento;
+            const tempo = item.tempo_caminhada_proximo;
+
+            html += `
+                <div class="rota-passo">
+                    <div class="rota-pin"></div>
+                    <strong>${index + 1}. ${ev.nome}</strong>
+                    <div class="rota-meta">
+                        <span><i class="fa-regular fa-clock"></i> ${ev.inicio} - ${ev.fim}</span><br>
+                        <span><i class="fa-solid fa-location-dot"></i> ${ev.local}</span>
+                    </div>
+                </div>
+            `;
+
+            if (tempo > 0 && index < data.roteiro.length - 1) {
+                html += `
+                    <div class="deslocamento">
+                        <i class="fa-solid fa-person-walking"></i> ${tempo} min a pé
+                    </div>
+                `;
+            }
+        });
+
+        html += `</div>`;
+        divRes.innerHTML = html;
+    }
+
+    async function gerarRoteiroOtimizado() {
+        const dataSel = document.getElementById('data-visita').value;
+        const orcamento = document.getElementById('orcamento-input').value;
+
+        const res = await fetch(`api.php?acao=otimizar&orcamento=${orcamento}&data=${dataSel}`);
+        const data = await res.json();
+
+        const divRes = document.getElementById('resultado-otimizacao');
+        divRes.style.display = 'block';
+
+        if (data.total_eventos === 0) {
+            divRes.innerHTML = '<div class="alert-box danger">Sem espectáculos para esta data dentro do orçamento/horário disponível.</div>';
+            return;
+        }
+
+        let html = `
+            <div class="alert-box success">
+                <strong><i class="fa-solid fa-wand-magic-sparkles"></i> Sugestão Gerada!</strong>
+                Consegue assistir a <b>${data.total_eventos} espectáculos</b> com um investimento de <b>${data.custo_total}</b>.
+            </div>
+            <div class="ribbon-tag"><i class="fa-solid fa-list-ol"></i> Ordem do Dia</div>
+            <div class="rota">
+        `;
+
+        data.roteiro.forEach((item, index) => {
+            const ev = item.evento;
+            const tempo = item.tempo_deslocamento_anterior;
+
+            if (index > 0 && tempo > 0) {
+                html += `
+                    <div class="deslocamento">
+                        <i class="fa-solid fa-person-walking"></i> ${tempo} min a pé
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="rota-passo">
+                    <div class="rota-pin"></div>
+                    <strong>${index + 1}. ${ev.nome}</strong>
+                    <div class="rota-meta">
+                        <span><i class="fa-regular fa-clock"></i> ${ev.inicio} - ${ev.fim}</span><br>
+                        <span><i class="fa-solid fa-location-dot"></i> ${ev.local}</span>
+                        <span class="rota-preco">${ev.preco > 0 ? ev.preco.toFixed(2) + '€' : 'Grátis'}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        divRes.innerHTML = html;
+    }
+
+    /* ---------- INSTALAÇÃO NO ECRÃ PRINCIPAL ---------- */
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function isIOS() {
+        return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    }
+
+    function prepararInstalacao() {
+        if (isStandalone()) return;
+        if (localStorage.getItem('vm_install_dismissed') === '1') return;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-fab').classList.add('show');
+        });
+
+        // iOS não dispara beforeinstallprompt: mostramos o convite na mesma
+        if (isIOS()) {
+            setTimeout(() => document.getElementById('install-fab').classList.add('show'), 800);
+        }
+
+        window.addEventListener('appinstalled', () => {
+            fecharInstallFab();
+        });
+    }
+
+    async function instalarApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            if (outcome === 'accepted') fecharInstallFab();
+            return;
+        }
+        abrirInstallModal();
+    }
+
+    function abrirInstallModal() {
+        const steps = document.getElementById('install-steps');
+        const desc = document.getElementById('install-modal-desc');
+
+        if (isIOS()) {
+            desc.textContent = 'No Safari, siga estes passos para adicionar a Viagem Medieval ao seu ecrã principal:';
+            steps.innerHTML = `
+                <li><span class="num">1</span> Toque no ícone <i class="fa-solid fa-arrow-up-from-bracket"></i> Partilhar na barra do Safari</li>
+                <li><span class="num">2</span> Escolha "Adicionar ao Ecrã Principal"</li>
+                <li><span class="num">3</span> Toque em "Adicionar" no canto superior direito</li>
+            `;
+        } else {
+            desc.textContent = 'No menu do seu navegador, procure a opção de instalar ou adicionar ao ecrã principal:';
+            steps.innerHTML = `
+                <li><span class="num">1</span> Abra o menu (⋮) no canto superior do navegador</li>
+                <li><span class="num">2</span> Escolha "Instalar app" ou "Adicionar ao ecrã principal"</li>
+                <li><span class="num">3</span> Confirme a instalação</li>
+            `;
+        }
+
+        document.getElementById('install-modal').classList.add('show');
+    }
+
+    function fecharInstallModal() {
+        document.getElementById('install-modal').classList.remove('show');
+    }
+
+    function fecharInstallFab() {
+        document.getElementById('install-fab').classList.remove('show');
+        localStorage.setItem('vm_install_dismissed', '1');
+    }
+</script>
+</body>
+</html>

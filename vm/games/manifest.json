@@ -1,0 +1,16 @@
+{
+  "name": "Torneio Medieval — Viagem Medieval de Santa Maria da Feira",
+  "short_name": "Torneio Medieval",
+  "description": "Três provas medievais. Joga sozinho ou com até 4 amigos no mesmo ecrã.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1410",
+  "theme_color": "#1a1410",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

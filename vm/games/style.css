@@ -1,0 +1,233 @@
+:root {
+  --parchment: #e8d9b5;
+  --parchment-dark: #cdb98a;
+  --iron: #1a1410;
+  --iron-soft: #241b15;
+  --royal-blue: #1e3a5f;
+  --oxblood: #7a1e1e;
+  --ochre: #c9972b;
+  --moss: #4c5b32;
+  --font-display: 'Press Start 2P', monospace;
+  --font-body: 'VT323', monospace;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: var(--iron); color: var(--parchment);
+  font-family: var(--font-body);
+  overflow: hidden; overscroll-behavior: none;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+
+#app { position: fixed; inset: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); display: flex; flex-direction: column; }
+
+/* ---------------- pixel components ---------------- */
+/* Regra de contraste: qualquer texto DENTRO de .pixel-panel (fundo claro,
+   pergaminho) usa cores escuras (iron / oxblood / royal-blue). Qualquer
+   texto FORA de um pixel-panel (fundo escuro, iron) usa cores claras
+   (branco / ochre). Nunca misturar as duas. */
+.pixel-panel {
+  background: var(--parchment); color: var(--iron);
+  border: 4px solid var(--iron);
+  box-shadow: inset 0 0 0 3px var(--ochre), 0 4px 0 var(--iron);
+  image-rendering: pixelated;
+}
+.pixel-btn {
+  font-family: var(--font-display); font-size: 11px; line-height: 1.6;
+  color: #fff8ea; background: var(--oxblood);
+  border: 3px solid var(--iron);
+  box-shadow: inset 0 0 0 2px var(--ochre), 0 4px 0 var(--iron);
+  padding: 12px 14px; cursor: pointer; text-align: center; letter-spacing: 0.5px;
+  transition: transform 0.05s ease; text-decoration: none; display: inline-block;
+}
+.pixel-btn:active { transform: translateY(3px); box-shadow: inset 0 0 0 2px var(--ochre), 0 1px 0 var(--iron); }
+.pixel-btn.secondary { background: var(--royal-blue); }
+.pixel-btn.gold { background: var(--ochre); color: var(--iron); }
+.pixel-btn:disabled { opacity: 0.45; cursor: default; }
+.pixel-btn.active { outline: 3px solid var(--moss); outline-offset: 2px; }
+
+/* ---------------- topbar ---------------- */
+#topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px; margin: 6px 6px 0 6px;
+  background: var(--iron-soft); border: 3px solid var(--ochre);
+  flex: none;
+}
+#topbarTitle { font-family: var(--font-display); font-size: 11px; color: var(--ochre); letter-spacing: 1px; }
+#topbarBtns { display: flex; gap: 6px; }
+.icon-btn {
+  border: 2px solid var(--ochre); background: var(--iron); color: #fff8ea;
+  font-size: 15px; width: 32px; height: 32px; cursor: pointer; padding: 0;
+}
+
+#gameRoot { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+/* ---------------- menu (fundo escuro -> texto claro) ---------------- */
+#menuWrap {
+  flex: 1; overflow-y: auto; padding: 14px 12px 24px; text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+.menu-title { font-family: var(--font-display); font-size: 19px; color: var(--ochre); margin: 6px 0 8px; line-height: 1.5; }
+.menu-sub { font-size: 18px; max-width: 380px; margin: 0 0 16px; color: #fff8ea; }
+#gameCards { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; margin-bottom: 18px; }
+.game-card {
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+  padding: 12px 14px; cursor: pointer; width: 100%; font-family: var(--font-body);
+}
+.game-card-icon { font-size: 26px; margin-bottom: 4px; }
+.game-card-name { font-family: var(--font-display); font-size: 13px; color: var(--oxblood); margin-bottom: 4px; }
+.game-card-players { font-size: 14px; color: var(--royal-blue); margin-bottom: 4px; }
+.game-card-desc { font-size: 17px; line-height: 1.3; color: var(--iron); }
+.game-card-edu { font-size: 13px; color: var(--moss); margin-top: 4px; font-weight: bold; }
+#tripLink { width: 100%; max-width: 420px; margin-bottom: 12px; }
+.menu-foot { max-width: 380px; }
+.small-note.menu-foot { color: #fff8ea; opacity: 0.95; }
+
+.flagbig {
+  width: 90px; height: 60px; background: #fff; border: 3px solid var(--iron);
+  position: relative; margin: 0 auto 14px; flex: none;
+}
+.flagbig::before, .flagbig::after { content: ""; position: absolute; background: var(--royal-blue); }
+.flagbig::before { left: 45%; top: 0; width: 6px; height: 100%; }
+.flagbig::after { top: 40%; left: 0; height: 6px; width: 100%; }
+
+/* ---------------- HUD (painel claro, para garantir contraste) ---------------- */
+.hud {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  padding: 7px 10px; margin: 6px 6px 0 6px; flex: none;
+  background: var(--parchment); border: 3px solid var(--iron);
+  box-shadow: inset 0 0 0 2px var(--ochre);
+}
+.hud .hud-block { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+.hud .hud-label { font-family: var(--font-display); font-size: 8px; color: var(--royal-blue); margin-bottom: 2px; font-weight: bold; }
+.hud .hud-value { font-family: var(--font-display); font-size: 12px; color: var(--iron); }
+.hud .hud-value.danger { color: var(--oxblood); }
+.hud .combo-box { font-size: 11px; color: var(--oxblood); min-height: 12px; }
+.hud .backBtn {
+  border: 2px solid var(--iron); background: var(--iron); color: #fff8ea;
+  font-family: var(--font-display); font-size: 9px; padding: 6px 8px; cursor: pointer; flex: none;
+}
+.mini-flag {
+  width: 24px; height: 16px; background: #fff; position: relative; border: 2px solid var(--iron); flex: none;
+}
+.mini-flag::before, .mini-flag::after { content: ""; position: absolute; background: var(--royal-blue); }
+.mini-flag::before { left: 45%; top: 0; width: 3px; height: 100%; }
+.mini-flag::after { top: 40%; left: 0; height: 3px; width: 100%; }
+
+/* ---------------- área de jogo (canvas letterboxed) ---------------- */
+.gameWrap {
+  position: relative; flex: 1; margin: 6px 6px 0 6px; overflow: hidden;
+  border: 4px solid var(--iron); box-shadow: inset 0 0 0 3px var(--ochre);
+  background: #100c09; display: flex; align-items: center; justify-content: center;
+}
+.gameWrap canvas { display: block; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+.hitFlash { position: absolute; inset: 0; background: rgba(122,30,30,0.55); opacity: 0; pointer-events: none; z-index: 7; transition: opacity 0.08s ease; }
+.hitFlash.show { opacity: 1; }
+
+.toast {
+  position: absolute; left: 50%; top: 18%; transform: translate(-50%, -10px);
+  font-family: var(--font-display); font-size: 12px; text-align: center;
+  background: var(--iron); color: var(--ochre); border: 3px solid var(--ochre);
+  padding: 10px 14px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease;
+  max-width: 88%; z-index: 8;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast .toast-date { display: block; margin-top: 6px; font-family: var(--font-body); font-size: 15px; color: #fff8ea; }
+
+.tapHint {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-body); font-size: 19px; color: #fff;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6); z-index: 6; pointer-events: none; animation: pulse 1.4s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.55;} 50%{opacity:1;} }
+
+.chronicle {
+  margin: 6px 6px 6px 6px; padding: 6px 10px; font-family: var(--font-body); font-size: 14px;
+  color: var(--iron); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: none;
+}
+.chronicle b { color: var(--oxblood); }
+
+/* ---------------- overlays / modais (fundo claro -> texto escuro) ---------------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 20; background: rgba(10,7,5,0.86);
+  display: flex; align-items: center; justify-content: center; padding: 18px;
+}
+.overlay.hidden { display: none; }
+.modal { width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto; padding: 20px 18px; text-align: center; }
+.modal h1 { font-family: var(--font-display); font-size: 17px; color: var(--oxblood); line-height: 1.6; margin: 4px 0 14px; }
+.modal h2 { font-family: var(--font-display); font-size: 13px; color: var(--royal-blue); margin: 18px 0 10px; }
+.modal p, .modal li { font-size: 18px; line-height: 1.35; margin: 8px 0; }
+.modal .btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.divider { border: none; border-top: 3px dashed var(--iron); margin: 16px 0; opacity: 0.5; }
+.small-note { font-size: 15px; font-weight: bold; color: var(--royal-blue); line-height: 1.35; }
+.edu-warning {
+  font-size: 15px; color: #fff8ea; background: var(--moss);
+  border: 3px solid var(--iron); padding: 8px 10px; margin: 10px 0;
+}
+
+.conquest-list { list-style: none; padding: 0; margin: 6px 0; text-align: left; display: inline-block; }
+.conquest-list li::before { content: "\2694"; margin-right: 6px; color: var(--oxblood); }
+.conquest-list li.missed { opacity: 0.4; text-decoration: line-through; }
+
+.choice-row { display: flex; gap: 10px; margin: 10px 0; }
+.choice-row .pixel-btn { flex: 1; font-size: 10px; }
+
+.field { text-align: left; margin: 10px 0; }
+.field label { display: block; font-size: 13px; color: var(--royal-blue); margin-bottom: 3px; }
+.field input {
+  width: 100%; font-family: var(--font-body); font-size: 18px; padding: 8px;
+  border: 3px solid var(--iron); background: #fffaf0; color: var(--iron);
+}
+.networkInstructions {
+  text-align: left; font-size: 15px; background: rgba(30,58,95,0.08);
+  border-left: 4px solid var(--royal-blue); padding: 8px 10px; margin-top: 8px; display: none;
+}
+.networkInstructions.show { display: block; }
+.networkInstructions ul { margin: 4px 0; padding-left: 18px; }
+
+.player-result-card {
+  border: 3px solid var(--iron); padding: 10px 12px; margin: 10px 0; text-align: left; background: rgba(0,0,0,0.03);
+}
+.player-result-card .pr-name { font-family: var(--font-display); font-size: 12px; margin-bottom: 4px; color: var(--iron); }
+.player-result-card .pr-score { font-size: 20px; color: var(--iron); }
+.player-result-card.winner { box-shadow: inset 0 0 0 3px var(--ochre); }
+.royal-feat-tag {
+  display: inline-block; font-family: var(--font-display); font-size: 9px; color: #fff8ea;
+  background: var(--oxblood); padding: 3px 6px; margin-top: 4px;
+}
+
+/* ---------------- ecrãs de configuração / resultados multi-jogador ---------------- */
+.screen-center { flex: 1; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; padding: 16px 12px 30px; }
+.player-count-row { display: flex; gap: 8px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+.player-count-row .pixel-btn { min-width: 54px; }
+.player-name-field { text-align: left; max-width: 340px; margin: 10px auto; display: flex; align-items: center; gap: 8px; }
+.player-name-field .swatch { width: 22px; height: 22px; border: 2px solid var(--iron); flex: none; }
+.player-name-field input {
+  flex: 1; font-family: var(--font-body); font-size: 19px; padding: 7px;
+  border: 3px solid var(--iron); background: #fffaf0; color: var(--iron);
+}
+.bracket-list { list-style: none; padding: 0; margin: 10px 0; text-align: left; display: inline-block; font-size: 17px; }
+.bracket-list li { margin: 4px 0; }
+.vs-title { font-family: var(--font-display); font-size: 16px; color: var(--oxblood); margin: 10px 0; }
+
+/* ---------------- cultura geral / trivia ---------------- */
+.trivia-turn { font-family: var(--font-display); font-size: 13px; color: var(--oxblood); margin: 6px 0 10px; }
+.trivia-question { font-size: 21px; margin: 10px 0 16px; line-height: 1.35; }
+.trivia-options { display: flex; flex-direction: column; gap: 10px; margin: 10px 0; }
+.trivia-options .pixel-btn { text-align: left; font-family: var(--font-body); font-size: 18px; }
+.trivia-options .pixel-btn.correct { background: var(--moss); }
+.trivia-options .pixel-btn.wrong { background: var(--oxblood); opacity: 0.7; }
+.trivia-timerbar { height: 8px; background: var(--iron); border: 2px solid var(--iron); margin: 8px 0 16px; }
+.trivia-timerbar-fill { height: 100%; background: var(--ochre); transition: width 0.1s linear; }
+.trivia-scoreboard { list-style: none; padding: 0; margin: 6px 0; text-align: left; display: inline-block; }
+.trivia-scoreboard li { font-size: 18px; margin: 3px 0; }
+
+#installHint {
+  position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 25; font-size: 15px; padding: 10px 12px; display: flex; align-items: center;
+  justify-content: space-between; gap: 10px;
+}
+#installHint button { flex: none; }
+#installHint.hidden { display: none; }
